@@ -7,7 +7,7 @@ export default async function MovieDetailPage({ params }: any) {
 
   await connectDB();
 
-  const movie = await Content.findById(id).lean();
+  const movie = (await Content.findById(id).lean()) as any;
 
   if (!movie) {
     return (
