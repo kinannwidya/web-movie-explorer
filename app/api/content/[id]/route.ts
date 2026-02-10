@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import Content from "@/models/Content";
 
-interface RouteParams {
-  params: { id: string }; // ✅ BUKAN Promise
+interface RouteContext {
+  params: Promise<{ id: string }>;
 }
 
 // 🟩 GET
 export async function GET(
-  req: Request,
-  { params }: RouteParams
+  req: NextRequest,
+  { params }: RouteContext
 ) {
+  const { id } = await params;
   await connectDB();
 
   try {
-    const content = await Content.findById(params.id).lean();
+    const content = await Content.findById(id).lean();
     if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -31,9 +33,10 @@ export async function GET(
 
 // 🟦 PATCH
 export async function PATCH(
-  req: Request,
-  { params }: RouteParams
+  req: NextRequest,
+  { params }: RouteContext
 ) {
+  const { id } = await params;
   await connectDB();
 
   try {
@@ -72,14 +75,13 @@ export async function PATCH(
       if (body[key] !== undefined) updateData[key] = body[key];
     }
 
-    const updated = await Content.findByIdAndUpdate(
-      params.id,
-      updateData,
-      { new: true }
-    );
+    const updated = await Content.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
-    if (!updated)
+    if (!updated) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     return NextResponse.json(updated);
   } catch (err) {
@@ -93,15 +95,17 @@ export async function PATCH(
 
 // 🟥 DELETE
 export async function DELETE(
-  req: Request,
-  { params }: RouteParams
+  req: NextRequest,
+  { params }: RouteContext
 ) {
+  const { id } = await params;
   await connectDB();
 
   try {
-    const deleted = await Content.findByIdAndDelete(params.id);
-    if (!deleted)
+    const deleted = await Content.findByIdAndDelete(id);
+    if (!deleted) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
