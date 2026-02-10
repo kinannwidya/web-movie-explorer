@@ -2,19 +2,23 @@
 import HomePageClient from "./components/HomePageClient";
 
 async function getData(endpoint: string) {
-  const res = await fetch(
-    `/api/content?endpoint=${endpoint}`,
-    { cache: "no-store" }
-  );
+  try {
+    const res = await fetch(
+      `/api/content?endpoint=${endpoint}`,
+      { cache: "no-store" }
+    );
 
-  if (!res.ok) {
-    console.error(`❌ Failed to fetch ${endpoint}`, res.status);
-    return []; // ⬅️ jangan crash SSR
+    if (!res.ok) {
+      console.error(`❌ Failed to fetch ${endpoint}`, res.status);
+      return [];
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error(`❌ Error fetching ${endpoint}`, err);
+    return [];
   }
-
-  return res.json();
 }
-
 
 export default async function HomePage() {
   // ✅ SSR fetch
