@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/db";
 import Content from "@/models/Content";
 
 export default async function MovieDetailPage({ params }: { params: { id: string } }) {
-  const { id } = await params;
+  const { id } = params;
   await connectDB();
 
   interface ContentType {
