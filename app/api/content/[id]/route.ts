@@ -1,21 +1,23 @@
-// app/api/content/[id]/route.ts
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Content from "@/models/Content";
 
 interface RouteParams {
-  params: Promise<{ id: string }>; // ⚡ wajib Promise di Next.js 15+
+  params: { id: string }; // ✅ BUKAN Promise
 }
 
 // 🟩 GET
-export async function GET(req: Request, { params }: RouteParams) {
-  const { id } = await params;
+export async function GET(
+  req: Request,
+  { params }: RouteParams
+) {
   await connectDB();
 
   try {
-    const content = await Content.findById(id);
-    if (!content)
+    const content = await Content.findById(params.id).lean();
+    if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     return NextResponse.json(content);
   } catch (err) {
@@ -27,15 +29,16 @@ export async function GET(req: Request, { params }: RouteParams) {
   }
 }
 
-// 🟦 PATCH (update)
-export async function PATCH(req: Request, { params }: RouteParams) {
-  const { id } = await params;
+// 🟦 PATCH
+export async function PATCH(
+  req: Request,
+  { params }: RouteParams
+) {
   await connectDB();
 
   try {
     const body = await req.json();
 
-    // 🔹 daftar field yang boleh diupdate (termasuk hero)
     const allowedFields = [
       "title",
       "description",
@@ -64,13 +67,17 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       "heroTitlePublicId",
     ];
 
-    // 🔹 filter field agar tidak kirim field asing
-    const updateData: Record<string, any> = {};
+    const updateData: Record<string, unknown> = {};
     for (const key of allowedFields) {
       if (body[key] !== undefined) updateData[key] = body[key];
     }
 
-    const updated = await Content.findByIdAndUpdate(id, updateData, { new: true });
+    const updated = await Content.findByIdAndUpdate(
+      params.id,
+      updateData,
+      { new: true }
+    );
+
     if (!updated)
       return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -85,12 +92,14 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 }
 
 // 🟥 DELETE
-export async function DELETE(req: Request, { params }: RouteParams) {
-  const { id } = await params;
+export async function DELETE(
+  req: Request,
+  { params }: RouteParams
+) {
   await connectDB();
 
   try {
-    const deleted = await Content.findByIdAndDelete(id);
+    const deleted = await Content.findByIdAndDelete(params.id);
     if (!deleted)
       return NextResponse.json({ error: "Not found" }, { status: 404 });
 
