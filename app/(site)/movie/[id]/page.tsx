@@ -1,3 +1,4 @@
+// app\(site)\[id]\page.tsx
 import MovieDetailClient from "./MovieDetailClient";
 import { connectDB } from "@/lib/db";
 import Content from "@/models/Content";
