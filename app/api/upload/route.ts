@@ -7,19 +7,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string) || "posters";
 
-    if (!file)
+    if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    return new Promise((resolve, reject) => {
+    // 🔑 bungkus upload ke Promise<Response>
+    const response = await new Promise<Response>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { folder: `viemo/${folder}` },
         (
@@ -28,21 +30,33 @@ export async function POST(req: Request) {
         ) => {
           if (error || !result) {
             console.error("❌ Cloudinary upload error:", error);
-            reject(NextResponse.json({ error: "Upload failed" }, { status: 500 }));
+            reject(
+              NextResponse.json(
+                { error: "Upload failed" },
+                { status: 500 }
+              )
+            );
           } else {
             resolve(
               NextResponse.json({
                 url: result.secure_url,
-                publicId: result.public_id, // ⬅️ penting buat delete nanti
+                publicId: result.public_id,
               })
             );
           }
         }
       );
+
       stream.end(buffer);
     });
+
+    return response; // ✅ Response
+
   } catch (err: any) {
     console.error("Server error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
   }
 }
