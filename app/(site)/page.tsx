@@ -2,17 +2,19 @@
 import HomePageClient from "./components/HomePageClient";
 
 async function getData(endpoint: string) {
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
+  const res = await fetch(
+    `/api/content?endpoint=${endpoint}`,
+    { cache: "no-store" }
+  );
 
-  const url = `${base}/api/content?endpoint=${endpoint}`;
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
+  if (!res.ok) {
+    console.error(`❌ Failed to fetch ${endpoint}`, res.status);
+    return []; // ⬅️ jangan crash SSR
+  }
+
   return res.json();
 }
+
 
 export default async function HomePage() {
   // ✅ SSR fetch
