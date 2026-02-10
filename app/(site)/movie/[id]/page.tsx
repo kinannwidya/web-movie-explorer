@@ -1,29 +1,13 @@
-// app\(site)\[id]\page.tsx
 import MovieDetailClient from "./MovieDetailClient";
 import { connectDB } from "@/lib/db";
 import Content from "@/models/Content";
 
-export default async function MovieDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function MovieDetailPage({ params }: any) {
+  const { id } = params; // ⬅️ TANPA await
+
   await connectDB();
 
-  interface ContentType {
-    _id: string;
-    title: string;
-    genre?: string;
-    year?: number;
-    description?: string;
-    rating?: number;
-    type: string;
-    poster?: string;
-    duration?: string;
-    country?: string;
-    tags?: string[];
-    cast?: string[];
-    similar?: ContentType[];
-  }
-
-  const movie = (await Content.findById(id).lean()) as unknown as ContentType | null;
+  const movie = await Content.findById(id).lean();
 
   if (!movie) {
     return (
