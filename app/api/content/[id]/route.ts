@@ -10,13 +10,13 @@ interface RouteContext {
 // 🟩 GET
 export async function GET(
   req: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
   await connectDB();
 
   try {
-    const content = await Content.findById(id).lean();
+    const content = await Content.findById(params.id).lean();
+
     if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -30,6 +30,7 @@ export async function GET(
     );
   }
 }
+
 
 // 🟦 PATCH
 export async function PATCH(
