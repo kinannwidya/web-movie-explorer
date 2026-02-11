@@ -1,10 +1,13 @@
 // app/(site)/page.tsx
 import HomePageClient from "./components/HomePageClient";
-
 async function getData(endpoint: string) {
   try {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      "https://web-movie-explorer.vercel.app";
+
     const res = await fetch(
-      `/api/content?endpoint=${endpoint}`,
+      `${baseUrl}/api/content?endpoint=${endpoint}`,
       { cache: "no-store" }
     );
 
@@ -19,6 +22,7 @@ async function getData(endpoint: string) {
     return [];
   }
 }
+
 
 export default async function HomePage() {
   // ✅ SSR fetch
