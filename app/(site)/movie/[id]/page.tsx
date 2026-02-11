@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 export default async function MovieDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/content/${params.id}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/content/${id}`,
     { cache: "no-store" }
   );
 
