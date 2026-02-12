@@ -16,7 +16,7 @@ export async function GET(
   await connectDB();
 
   try {
-    const content = await Content.findById(id).lean();
+    const content = await Content.findById(id).lean() as any;
 
     if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
