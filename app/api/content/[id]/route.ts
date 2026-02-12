@@ -16,15 +16,25 @@ export async function GET(
   await connectDB();
 
   try {
-    const content = await Content.findById(id)
-      .populate("similar") // 🔥 FIX
-      .lean();
+    const content = await Content.findById(id).lean();
 
     if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    return NextResponse.json(content);
+    // 🔥 Auto generate similar by genre
+    const similar = await Content.find({
+      _id: { $ne: id },
+      genre: content.genre,
+      status: "published",
+    })
+      .limit(6)
+      .lean();
+
+    return NextResponse.json({
+      ...content,
+      similar,
+    });
   } catch (err) {
     console.error("❌ Failed to fetch content:", err);
     return NextResponse.json(
