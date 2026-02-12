@@ -16,7 +16,9 @@ export async function GET(
   await connectDB();
 
   try {
-    const content = await Content.findById(id).lean();
+    const content = await Content.findById(id)
+      .populate("similar") // 🔥 FIX
+      .lean();
 
     if (!content) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -31,6 +33,7 @@ export async function GET(
     );
   }
 }
+
 
 // 🟦 PATCH
 export async function PATCH(
