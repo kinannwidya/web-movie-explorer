@@ -33,6 +33,9 @@ interface Movie {
 }
 
 export default function MovieDetailClient({ movie }: { movie: Movie }) {
+  console.log("🎬 MOVIE DATA:", movie);
+  console.log("🎥 SIMILAR:", movie?.similar);
+  
   const [showMore, setShowMore] = useState(false);
   const isSeries = movie.type === "series";
 
