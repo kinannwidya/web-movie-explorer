@@ -88,9 +88,6 @@ export default function HomePageClient({
         {/* Category picker */}
         <CategorySection />
 
-        {/* Popular */}
-        <ContentSection title="Popular Now" items={popular} loading={false} />
-
         {/* Top Picks */}
         <TopPicksClient
           allContent={[

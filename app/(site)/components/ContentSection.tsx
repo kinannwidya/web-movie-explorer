@@ -12,6 +12,7 @@ export default function ContentSection({
   comingSoon = false,
   limit,
   onItemClick,
+  showRanking = false,   // 👈 tambah ini
 }: {
   title: string;
   items: Content[];
@@ -19,7 +20,9 @@ export default function ContentSection({
   comingSoon?: boolean;
   limit?: number;
   onItemClick?: (item: Content) => void;
-}) {
+  showRanking?: boolean; // 👈 tambah ini
+})
+ {
   const [hovered, setHovered] = useState<string | null>(null);
   const visibleItems = limit ? items.slice(0, limit) : items;
   const isPopularSection = title?.toLowerCase().includes("popular") ?? false;
@@ -63,7 +66,7 @@ export default function ContentSection({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 relative">
         {uniqueItems.map((m, i) => {
           const rank = m.popularityRank ?? i + 1;
-          const isTop10 = isPopularSection && rank <= 10;
+          const isTop10 = showRanking && rank <= 10;
           const isSoon =
             m.releaseDate && new Date(m.releaseDate).getTime() > Date.now();
           const isOriginal = m.tags?.includes("original");

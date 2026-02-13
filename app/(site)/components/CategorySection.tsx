@@ -56,7 +56,13 @@ export default function CategorySection() {
         ))}
       </div>
 
-      <ContentSection title={activeCategory} items={items} loading={loading} limit={6} />
+      <ContentSection 
+  title={activeCategory} 
+  items={items} 
+  loading={loading}
+  limit={6}
+  showRanking={activeCategory === "Trending"}
+/>
     </section>
   );
 }
